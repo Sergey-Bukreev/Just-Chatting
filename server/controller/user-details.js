@@ -5,13 +5,13 @@ async function userDetailsController(req, res) {
         const token = req.cookies.token || ''
         const user = await getUserDetailsFromToken(token)
         return res.json({
-            message:'',
+            message:'User details successfully',
             data:user
         })
 
     } catch (error) {
         res.status(500).json({
-            message: error.message | error,
+            message: error.message || error,
             error:true
 
         })

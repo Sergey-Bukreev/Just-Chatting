@@ -17,11 +17,6 @@ const getUserDetailsFromToken = async (token) => {
    } catch (error) {
        console.log(error)
    }
-
-
-    // return res.status(200).json({
-    //     message:'user details',
-    //     data:user
-    // })
+   
 }
 module.exports = getUserDetailsFromToken;
