@@ -1,3 +1,10 @@
+import { PasswordForm } from '../../components/forms/password-form/password-form'
+import { Page } from '../../components/ui/page'
+
 export const CheckPasswordPage = () => {
-  return <div>{'Check Password Page'}</div>
+  return (
+    <Page>
+      <PasswordForm />
+    </Page>
+  )
 }

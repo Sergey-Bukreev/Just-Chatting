@@ -4,12 +4,12 @@ import { toast } from 'react-toastify'
 
 import axios from 'axios'
 
-import s from './register-form.module.scss'
+import s from './../form.module.scss'
 
-import { Button } from '../ui/button'
-import { FileUploaderWithPreview } from '../ui/file-loader-with-preview/file-loader-with-preview'
-import { Input } from '../ui/input/input'
-import { Typography } from '../ui/typography'
+import { Button } from '../../ui/button'
+import { FileUploaderWithPreview } from '../../ui/file-loader-with-preview/file-loader-with-preview'
+import { Input } from '../../ui/input/input'
+import { Typography } from '../../ui/typography'
 
 export const RegisterForm = () => {
   const [data, setData] = useState({
@@ -111,7 +111,7 @@ export const RegisterForm = () => {
       <Button className={s.sendButton}>{'Register'}</Button>
       <div className={s.loginLink}>
         <Typography variant={'body2'}>{'Already have account ?'}</Typography>
-        <Typography as={Link} to={'/'} variant={'link1'}>
+        <Typography as={Link} to={'/email'} variant={'link1'}>
           {'Sign-In'}
         </Typography>
       </div>
