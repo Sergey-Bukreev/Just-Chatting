@@ -106,7 +106,7 @@ export const RegisterForm = () => {
         />
       </div>
       <div className={s.inputWrapper}>
-        <FileUploaderWithPreview onPhotoChange={handlePhotoChange} />
+        <FileUploaderWithPreview onPhotoChange={handlePhotoChange} text={'Chose a photo'} />
       </div>
       <Button className={s.sendButton}>{'Register'}</Button>
       <div className={s.loginLink}>

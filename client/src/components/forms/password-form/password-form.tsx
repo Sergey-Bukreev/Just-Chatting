@@ -1,4 +1,5 @@
 import { ChangeEvent, useState } from 'react'
+import { useDispatch } from 'react-redux'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
@@ -6,6 +7,7 @@ import axios from 'axios'
 
 import s from './../form.module.scss'
 
+import { setToken } from '../../../store/userSlice'
 import { Button } from '../../ui/button'
 import { Input } from '../../ui/input/input'
 import { Typography } from '../../ui/typography'
@@ -16,6 +18,7 @@ export const PasswordForm = () => {
   })
   const navigate = useNavigate()
   const location = useLocation()
+  const dispatch = useDispatch()
   const state = location.state
 
   const handleOnChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -48,10 +51,11 @@ export const PasswordForm = () => {
 
       toast.success(response.data.message)
       if (response.data.success) {
-        setData({
-          password: '',
-        })
-        navigate('/home')
+        dispatch(setToken(response?.data?.token))
+        localStorage.setItem('token', response.data.token)
+        setData({ password: '' })
+
+        navigate(`/home`)
       }
     } catch (error: any) {
       toast.error(error?.response?.data?.message)

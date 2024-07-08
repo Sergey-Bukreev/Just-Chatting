@@ -8,9 +8,10 @@ import { FileLoader } from '../file-loader/file-loader'
 
 type PhotoUploaderProps = {
   onPhotoChange: (fileUrl: null | string) => void
+  text?: string
 } & Omit<ButtonProps, 'onChange' | 'onClick' | 'type'>
 
-export const FileUploaderWithPreview = ({ onPhotoChange, ...rest }: PhotoUploaderProps) => {
+export const FileUploaderWithPreview = ({ onPhotoChange, text, ...rest }: PhotoUploaderProps) => {
   const [uploadPhoto, setUploadPhoto] = useState<null | string>(null)
   const [preview, setPreview] = useState<null | string>(null)
 
@@ -68,7 +69,7 @@ export const FileUploaderWithPreview = ({ onPhotoChange, ...rest }: PhotoUploade
           variant={'secondary'}
           {...rest}
         >
-          {'Choose a photo'}
+          {text}
         </FileLoader>
       )}
     </>

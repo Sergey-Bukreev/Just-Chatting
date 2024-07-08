@@ -1,0 +1,51 @@
+.root {
+  border: 2px solid var(--color-dark-300);
+  gap: 1rem;
+  display: flex;
+  flex-direction: row;
+  //padding: 0.5rem;
+}
+.sideMenu {
+  width: 50px;
+  height: 50vh;
+  display: flex;
+  padding: 0.5rem;
+  gap: 1rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--color-dark-500);
+  transition: 0.4s;
+}
+
+.block {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  flex-direction: column;
+}
+.menu {
+  width: 100%;
+}
+.icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+.iconButton {
+  border: none;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition:
+    background-color 0.3s ease,
+    transform 0.3s ease;
+
+  &:hover,
+  &:focus {
+    background: linear-gradient(135deg, var(--color-dark-100), var(--color-dark-900));
+  }
+
+  &:active {
+    background: linear-gradient(135deg, var(--color-dark-100), var(--color-dark-900));
+  }
+}

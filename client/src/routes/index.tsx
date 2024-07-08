@@ -3,7 +3,7 @@ import { Outlet, RouteObject, RouterProvider, createBrowserRouter } from 'react-
 import { Layout } from '../components/layout/layout'
 import { CheckEmailPage } from '../pages/check-email-page'
 import { CheckPasswordPage } from '../pages/check-password'
-import { ForgotPasswordPage } from '../pages/forgot-password-page/forgot-password.page.tsx'
+import { ForgotPasswordPage } from '../pages/forgot-password-page/forgot-password.page'
 import { HomePage } from '../pages/home-page'
 import { MessagePage } from '../pages/message-page'
 import { RegisterPage } from '../pages/register-page'
