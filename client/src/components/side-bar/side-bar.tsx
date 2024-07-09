@@ -1,56 +1,50 @@
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
-import { Link } from 'react-router-dom'
-
-import { FaUserEdit } from 'react-icons/fa'
-import { RiChat1Line, RiLogoutCircleLine, RiUserAddFill } from 'react-icons/ri'
 
 import s from './side-bar.module.scss'
 
 import { RootState } from '../../store/store'
+import { Dialogs } from '../dialogs'
 import { EditUserForm } from '../forms/edit-user-form/edit-user-form'
-import { Avatar } from '../ui/avatar/avataar'
-import { Button } from '../ui/button'
+import { SearchFriends } from '../search-friends/search-friends'
+import { SideMenu } from './side-menu'
 
 export const SideBar = () => {
   const user = useSelector((state: RootState) => state.user)
   const [isOpenEditUserDetails, setIsOpenEditUserDetails] = useState<boolean>(false)
+  const [isOpenMessages, setIsOpenMessages] = useState<boolean>(true)
+  const [isOpenAddFriends, setIsOpenAddFriends] = useState<boolean>(false)
 
   const handleOpenEditUserDetails = () => {
+    setIsOpenAddFriends(false)
+    setIsOpenMessages(false)
     setIsOpenEditUserDetails(true)
   }
-  const handleCloseEditUserDetails = () => {
+
+  const handleOpenMessages = () => {
+    setIsOpenAddFriends(false)
     setIsOpenEditUserDetails(false)
+    setIsOpenMessages(true)
+  }
+
+  const handleOpenAddFriends = () => {
+    setIsOpenMessages(false)
+    setIsOpenEditUserDetails(false)
+    setIsOpenAddFriends(true)
   }
 
   return (
     <div className={s.root}>
-      <div className={s.sideMenu}>
-        <div className={s.block}>
-          <Avatar initials={user.name} size={40} src={user.profile_pic} />
-          <Button className={s.iconButton} onClick={handleOpenEditUserDetails} variant={'icon'}>
-            <FaUserEdit className={s.icon} />
-          </Button>
-
-          <Button
-            as={Link}
-            className={s.iconButton}
-            onClick={handleCloseEditUserDetails}
-            to={''}
-            variant={'icon'}
-          >
-            <RiChat1Line className={s.icon} />
-          </Button>
-          <Button className={s.iconButton} onClick={handleCloseEditUserDetails} variant={'icon'}>
-            <RiUserAddFill className={s.icon} />
-          </Button>
-        </div>
-        <Button className={s.iconButton} variant={'icon'}>
-          <RiLogoutCircleLine className={s.icon} />
-        </Button>
-      </div>
+      <SideMenu
+        active={isOpenMessages}
+        onOpenAddFriendsClick={handleOpenAddFriends}
+        onOpenEditClick={handleOpenEditUserDetails}
+        onOpenMessagesClick={handleOpenMessages}
+      />
       <div className={s.menu}>
-        {isOpenEditUserDetails && <EditUserForm onClose={handleCloseEditUserDetails} user={user} />}
+        {isOpenEditUserDetails && <EditUserForm user={user} />}
+        {isOpenMessages && <Dialogs />}
+        {isOpenAddFriends && <SearchFriends />}
       </div>
     </div>
   )

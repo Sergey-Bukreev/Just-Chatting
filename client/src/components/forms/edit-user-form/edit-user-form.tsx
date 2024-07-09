@@ -15,14 +15,14 @@ import { FileLoader } from '../../ui/file-loader/file-loader'
 import { Input } from '../../ui/input/input'
 import { Typography } from '../../ui/typography'
 export type EditUserFormProps = {
-  onClose: () => void
   user: UserState
 }
-export const EditUserForm = ({ onClose, user }: EditUserFormProps) => {
+export const EditUserForm = ({ user }: EditUserFormProps) => {
   const [data, setData] = useState({
     name: user.name,
     profile_pic: user.profile_pic,
   })
+  const [editMode, setEditMode] = useState<boolean>(false)
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -70,7 +70,7 @@ export const EditUserForm = ({ onClose, user }: EditUserFormProps) => {
       if (response.data.success) {
         dispatch(setUser(response.data.data))
       }
-      onClose()
+      setEditMode(false)
     } catch (error: any) {
       toast.error(error.message)
     }
@@ -78,7 +78,7 @@ export const EditUserForm = ({ onClose, user }: EditUserFormProps) => {
 
   return (
     <form className={s.form} onSubmit={handleSubmit}>
-      <Typography className={s.title} variant={'h1'}>
+      <Typography className={s.title} variant={'h2'}>
         {'Just Edit Profile'}
       </Typography>
       <div className={s.avatarWrapper}>
@@ -100,21 +100,32 @@ export const EditUserForm = ({ onClose, user }: EditUserFormProps) => {
           <RiEditFill className={s.icon} />
         </FileLoader>
       </div>
-
-      <div className={s.inputWrapper}>
-        <Input
-          id={'name'}
-          label={'Name'}
-          name={'name'}
-          onChange={handleOnChange}
-          placeholder={'Enter your name'}
-          required
-          type={'text'}
-          value={data.name}
-        />
-
-        <Button className={s.sendButton}>{'Save'}</Button>
-      </div>
+      {editMode && (
+        <div className={s.inputWrapper}>
+          <Input
+            id={'name'}
+            label={'Name'}
+            name={'name'}
+            onChange={handleOnChange}
+            placeholder={'Enter your name'}
+            required
+            type={'text'}
+            value={data.name}
+          />
+        </div>
+      )}
+      {!editMode && (
+        <div className={s.infoBlock}>
+          <div className={s.nameBlock}>
+            <Typography variant={'h1'}>{user.name}</Typography>
+            <Button className={s.editButton} onClick={() => setEditMode(true)} variant={'icon'}>
+              <RiEditFill size={18} />
+            </Button>
+          </div>
+          <Typography variant={'subTitle1'}>{user.email}</Typography>
+        </div>
+      )}
+      <Button className={s.sendButton}>{'Save'}</Button>
     </form>
   )
 }

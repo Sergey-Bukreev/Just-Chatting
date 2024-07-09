@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
 import axios from 'axios'
@@ -11,11 +11,11 @@ import { SideBar } from '../../components/side-bar'
 import { Page } from '../../components/ui/page'
 import { RootState } from '../../store/store'
 import { logout, setUser } from '../../store/userSlice'
-import { MessagePage } from '../message-page'
 export const HomePage = () => {
   const user = useSelector((state: RootState) => state.user)
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const location = useLocation()
   const fetchUserDetails = async () => {
     try {
       const URL = `${import.meta.env.VITE_REACT_BACKEND_URL}/api/user-details`
@@ -38,11 +38,14 @@ export const HomePage = () => {
   useEffect(() => {
     fetchUserDetails()
   }, [])
+  const basePath = location.pathname === '/'
 
   return (
     <Page className={s.root}>
-      <SideBar />
-      <MessagePage />
+      <div className={s.sideBar}>
+        <SideBar />
+      </div>
+      <div className={s.outlet}>{!basePath && <Outlet />}</div>
     </Page>
   )
 }

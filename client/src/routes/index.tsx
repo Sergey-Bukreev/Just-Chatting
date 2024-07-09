@@ -27,12 +27,14 @@ const publicRoutes: RouteObject[] = [
 ]
 const privateRoutes: RouteObject[] = [
   {
+    children: [
+      {
+        element: <MessagePage />,
+        path: ':userId',
+      },
+    ],
     element: <HomePage />,
     path: '/home',
-  },
-  {
-    element: <MessagePage />,
-    path: '/home/:userId',
   },
 ]
 
