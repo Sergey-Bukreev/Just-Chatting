@@ -6,10 +6,14 @@ const router = require('./routes/index');
 const cookieParser = require('cookie-parser');
 
 const app = express();
-app.use(cors({
-    origin: process.env.FRONTEND_URL,
+const corsOptions = {
+    origin: ['http://localhost:5173', process.env.FRONTEND_URL],
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type'],
     credentials: true,
-}));
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser())
 
