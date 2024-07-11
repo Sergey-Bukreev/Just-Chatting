@@ -4,18 +4,28 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
 import axios from 'axios'
+import { io } from 'socket.io-client'
 
 import s from './home.page.module.scss'
 
 import { SideBar } from '../../components/side-bar'
 import { Page } from '../../components/ui/page'
 import { RootState } from '../../store/store'
-import { logout, setUser } from '../../store/userSlice'
+import {
+  OnlineUsersType,
+  logout,
+  setOnlineUsers,
+  setSocketConnection,
+  setUser,
+} from '../../store/userSlice'
 export const HomePage = () => {
   const user = useSelector((state: RootState) => state.user)
+
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const location = useLocation()
+
+  console.log('user', user)
   const fetchUserDetails = async () => {
     try {
       const URL = `${import.meta.env.VITE_REACT_BACKEND_URL}/api/user-details`
@@ -39,6 +49,27 @@ export const HomePage = () => {
     fetchUserDetails()
   }, [])
   const basePath = location.pathname === '/'
+
+  /// socket connection
+  useEffect(() => {
+    const backendUrl = import.meta.env.VITE_REACT_BACKEND_URL
+    const socketConnection = io(backendUrl, {
+      auth: {
+        token: localStorage.getItem('token'),
+      },
+    })
+
+    socketConnection.on('online users', (data: OnlineUsersType) => {
+      console.log('online users', data)
+      dispatch(setOnlineUsers(data))
+    })
+    dispatch(setSocketConnection({ socketConnection }))
+    console.log('socket connection initialized')
+
+    return () => {
+      socketConnection.disconnect()
+    }
+  }, [])
 
   return (
     <Page className={s.root}>

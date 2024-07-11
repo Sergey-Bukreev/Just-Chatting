@@ -11,6 +11,7 @@ import { SideMenu } from './side-menu'
 
 export const SideBar = () => {
   const user = useSelector((state: RootState) => state.user)
+
   const [isOpenEditUserDetails, setIsOpenEditUserDetails] = useState<boolean>(false)
   const [isOpenMessages, setIsOpenMessages] = useState<boolean>(true)
   const [isOpenAddFriends, setIsOpenAddFriends] = useState<boolean>(false)

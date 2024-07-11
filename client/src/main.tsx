@@ -8,7 +8,7 @@ import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/700.css'
 
 import { App } from './App'
-import { store } from './store/store'
+import { store } from './store/store.ts'
 
 createRoot(document.getElementById('root') as HTMLElement).render(
   <StrictMode>

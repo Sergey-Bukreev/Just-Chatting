@@ -46,7 +46,6 @@ export const SearchFriends = () => {
   useEffect(() => {
     handleSearchFriends()
   }, [debouncedSearch])
-  console.log('search user', searchUser)
 
   return (
     <div className={s.root}>

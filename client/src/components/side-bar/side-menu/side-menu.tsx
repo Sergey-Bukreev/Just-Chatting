@@ -6,7 +6,7 @@ import { RiChat1Line, RiLogoutCircleLine, RiUserAddFill } from 'react-icons/ri'
 
 import s from './side-menu.module.scss'
 
-import { RootState } from '../../../store/store'
+import { RootState } from '../../../store/store.ts'
 import { Avatar } from '../../ui/avatar/avataar'
 import { Button } from '../../ui/button'
 
