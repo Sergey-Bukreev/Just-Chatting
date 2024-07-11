@@ -4,8 +4,8 @@ require('dotenv').config();
 const connectDB = require('./config/connectDB');
 const router = require('./routes/index');
 const cookieParser = require('cookie-parser');
-
-const app = express();
+const {app,server} = require('./socket/index')
+// const app = express();
 const corsOptions = {
     origin: ['http://localhost:5173', process.env.FRONTEND_URL],
     methods: ['GET', 'POST'],
@@ -27,7 +27,7 @@ const PORT = process.env.PORT || 8080;
 /// api endpoints
 app.use('/api', router)
 connectDB().then(()=> {
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
         console.log('server started on port' + PORT);
     })
 })
