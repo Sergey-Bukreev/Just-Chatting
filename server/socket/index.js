@@ -15,6 +15,12 @@ const io = new Server(server, {
         credentials: true,
     }
 });
+// app.use((req, res, next) => {
+//     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5174'); // Замените на ваш домен, если он отличается
+//     res.setHeader('Access-Control-Allow-Methods', 'GET,POST'); // Укажите допустимые методы запроса
+//     // res.setHeader('Access-Control-Allow-Headers', 'Content-Type'); // Укажите допустимые заголовки запроса
+//     next();
+// });
 const onlineUsers = new Set()
 io.on('connection', async (socket) => {
     console.log('connected user', socket.id);

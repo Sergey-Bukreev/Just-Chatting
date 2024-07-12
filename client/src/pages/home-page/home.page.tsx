@@ -4,28 +4,24 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
 import axios from 'axios'
-import { io } from 'socket.io-client'
 
 import s from './home.page.module.scss'
 
 import { SideBar } from '../../components/side-bar'
 import { Page } from '../../components/ui/page'
 import { RootState } from '../../store/store'
-import {
-  OnlineUsersType,
-  logout,
-  setOnlineUsers,
-  setSocketConnection,
-  setUser,
-} from '../../store/userSlice'
+import { OnlineUsersType, logout, setOnlineUsers, setUser } from '../../store/userSlice'
+import { useSocket } from '../../utils/socket-context'
+
 export const HomePage = () => {
   const user = useSelector((state: RootState) => state.user)
-
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const location = useLocation()
+  const socket = useSocket()
 
   console.log('user', user)
+
   const fetchUserDetails = async () => {
     try {
       const URL = `${import.meta.env.VITE_REACT_BACKEND_URL}/api/user-details`
@@ -47,29 +43,22 @@ export const HomePage = () => {
 
   useEffect(() => {
     fetchUserDetails()
-  }, [])
-  const basePath = location.pathname === '/'
+  }, [navigate])
 
-  /// socket connection
   useEffect(() => {
-    const backendUrl = import.meta.env.VITE_REACT_BACKEND_URL
-    const socketConnection = io(backendUrl, {
-      auth: {
-        token: localStorage.getItem('token'),
-      },
-    })
+    if (socket) {
+      socket.on('online users', (data: OnlineUsersType) => {
+        console.log('Received online users', data)
+        dispatch(setOnlineUsers(data))
+      })
 
-    socketConnection.on('online users', (data: OnlineUsersType) => {
-      console.log('online users', data)
-      dispatch(setOnlineUsers(data))
-    })
-    dispatch(setSocketConnection({ socketConnection }))
-    console.log('socket connection initialized')
-
-    return () => {
-      socketConnection.disconnect()
+      return () => {
+        socket.disconnect()
+      }
     }
-  }, [])
+  }, [socket, dispatch])
+
+  const basePath = location.pathname === '/'
 
   return (
     <Page className={s.root}>

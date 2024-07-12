@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 
 import s from './user-search-card.module.scss'
 
-import { RootState } from '../../store/store.ts'
+import { RootState } from '../../store/store'
 import { UserState } from '../../store/userSlice'
 import { Avatar } from '../ui/avatar/avataar'
 import { Typography } from '../ui/typography'
