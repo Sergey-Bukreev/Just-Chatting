@@ -1,7 +1,7 @@
 const express = require('express');
 const {Server} = require("socket.io");
 const http = require("http");
-const UserModel = require('./../models/user-model')
+const UserModel = require("../models/user-model");
 const getUserDetailsFromToken = require('./../helpers/get-user-details-from-token');
 const app = express();
 
@@ -15,19 +15,19 @@ const io = new Server(server, {
         credentials: true,
     }
 });
-// app.use((req, res, next) => {
-//     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5174'); // Замените на ваш домен, если он отличается
-//     res.setHeader('Access-Control-Allow-Methods', 'GET,POST'); // Укажите допустимые методы запроса
-//     // res.setHeader('Access-Control-Allow-Headers', 'Content-Type'); // Укажите допустимые заголовки запроса
-//     next();
-// });
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5174'); // Замените на ваш домен, если он отличается
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST'); // Укажите допустимые методы запроса
+    // res.setHeader('Access-Control-Allow-Headers', 'Content-Type'); // Укажите допустимые заголовки запроса
+    next();
+});
 const onlineUsers = new Set()
 io.on('connection', async (socket) => {
     console.log('connected user', socket.id);
 
     /// current user
     const token = socket.handshake.auth.token;
-    const user = await getUserDetailsFromToken(token)
+
 
     ///create a room
     // socket.join(user?._id)
@@ -48,14 +48,25 @@ io.on('connection', async (socket) => {
 
         socket.join(user?._id);
 
-        onlineUsers.add(user._id);
+        onlineUsers.add(user._id.toString());
 
 
         io.emit('online users', Array.from(onlineUsers));
 
         socket.on('message page', async (userId)=>{
             console.log('user id', userId)
-          // const user = await UserModel.findById(userId)
+            userId = userId.replace(/^:/, '');
+          const user = await UserModel.findById(userId).select('-password')
+            console.log('user details', user)
+
+            const payload = {
+                _id : user?._id,
+                name: user?.name,
+                email: user?.email,
+                profile_pic: user?.profile_pic,
+                online: onlineUsers.has(userId)
+            }
+            socket.emit('message user', payload);
 
         })
 

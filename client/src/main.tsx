@@ -9,7 +9,7 @@ import '@fontsource/roboto/700.css'
 
 import { App } from './App'
 import { store } from './store/store'
-import { SocketProvider } from './utils/socket-context.tsx'
+import { SocketProvider } from './utils/socket-context'
 
 createRoot(document.getElementById('root') as HTMLElement).render(
   <StrictMode>
