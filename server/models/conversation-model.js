@@ -15,7 +15,12 @@ const messageSchema = new mongoose.Schema({
     seen : {
         type: Boolean,
         default:false
-    }
+    },
+        msByUserId : {
+            type: mongoose.Schema.ObjectId,
+            required: true,
+            ref:'User'
+        }
 },
     {timestamps: true}
 )
