@@ -1,28 +1,31 @@
 const express = require('express');
-const {Server} = require("socket.io");
+const { Server } = require("socket.io");
 const http = require("http");
 const UserModel = require("../models/user-model");
-const {ConversationModel, MessageModel} = require('../models/conversation-model')
+const { ConversationModel, MessageModel } = require('../models/conversation-model');
 const getUserDetailsFromToken = require('./../helpers/get-user-details-from-token');
 const app = express();
 
 /// socket connection
 const server = http.createServer(app);
 const io = new Server(server, {
-    cors:{
+    cors: {
         origin: ['http://localhost:5173', process.env.FRONTEND_URL],
         methods: ['GET', 'POST'],
         allowedHeaders: ['Content-Type'],
         credentials: true,
     }
 });
+
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5174'); // Замените на ваш домен, если он отличается
-    res.setHeader('Access-Control-Allow-Methods', 'GET,POST'); // Укажите допустимые методы запроса
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST'); // Укажите допустимые методы запроса
     // res.setHeader('Access-Control-Allow-Headers', 'Content-Type'); // Укажите допустимые заголовки запроса
     next();
 });
-const onlineUsers = new Set()
+
+const onlineUsers = new Set();
+
 io.on('connection', async (socket) => {
     console.log('connected user', socket.id);
 
@@ -36,82 +39,140 @@ io.on('connection', async (socket) => {
 
         onlineUsers.add(user._id.toString());
 
-
         io.emit('online users', Array.from(onlineUsers));
 
-        socket.on('message page', async (userId)=>{
-            console.log('user id', userId)
+        socket.on('message page', async (userId) => {
+            console.log('user id', userId);
             userId = userId.replace(/^:/, '');
-          const user = await UserModel.findById(userId).select('-password')
-            console.log('user details', user)
 
-            const payload = {
-                _id : user?._id,
-                name: user?.name,
-                email: user?.email,
-                profile_pic: user?.profile_pic,
-                online: onlineUsers.has(userId)
+            try {
+                const otherUser = await UserModel.findById(userId).select('-password');
+                console.log('user details', otherUser);
+
+                if (!otherUser) {
+                    console.log('Other user not found');
+                    socket.emit('message', []);
+                    return;
+                }
+
+                const payload = {
+                    _id: otherUser._id,
+                    name: otherUser.name,
+                    email: otherUser.email,
+                    profile_pic: otherUser.profile_pic,
+                    online: onlineUsers.has(userId)
+                };
+                socket.emit('message user', payload);
+
+                /// get prev conversation messages
+                const conversation = await ConversationModel.findOne({
+                    '$or': [
+                        { sender: user?._id, receiver: userId },
+                        { sender: userId, receiver: user?._id }
+                    ]
+                }).populate('messages').sort({ updatedAt: -1 });
+
+                if (!conversation || !conversation.messages || conversation.messages.length === 0) {
+                    console.log('No conversation or messages found');
+                    socket.emit('message', []);
+                    return;
+                }
+
+                socket.emit('message', conversation.messages);
+
+            } catch (error) {
+                console.error('Error fetching conversation and messages:', error.message);
+                socket.emit('message', []);
             }
-            socket.emit('message user', payload);
-
-        })
+        });
 
         /// new message
-
         socket.on('new message', async (data) => {
-
-            /// check conversation is available both user
             const cleanedReceiver = data.receiver.replace(':', '');
 
-            let conversation = await ConversationModel.findOne({
-                '$or': [
-                    {sender:data?.sender, receiver: cleanedReceiver},
-                    {sender:cleanedReceiver, receiver: data?.sender}
-                ]
-            })
-            console.log('conversation', conversation)
-            /// if conversation is not available
-           if(!conversation) {
-               const createConversation = await ConversationModel({
-                   sender:data.sender,
-                   receiver: cleanedReceiver
-               })
-               conversation = await createConversation.save()
-           }
-           const message = new MessageModel({
-                text: data.text,
-               imageUrl: data.imageUrl,
-               videoUrl: data.videoUrl,
-               msByUserId: data.msByUserId
-           })
-            const saveMessage = await message.save()
-
-            const updateConversation = await ConversationModel.updateOne({_id: conversation._id}, {
-                '$push': {
-                    messages: saveMessage._id
+            //check conversation is available both user
+            try {
+                let conversation = await ConversationModel.findOne({
+                    '$or': [
+                        { sender: data?.sender, receiver: cleanedReceiver },
+                        { sender: cleanedReceiver, receiver: data?.sender }
+                    ]
+                });
+                //if conversation is not available
+                if (!conversation) {
+                    const newConversation = new ConversationModel({
+                        sender: data.sender,
+                        receiver: cleanedReceiver
+                    });
+                    conversation = await newConversation.save();
                 }
-            })
-            const getConversationMessage = await ConversationModel.findOne({
-                '$or': [
-                    {sender:data?.sender, receiver: cleanedReceiver},
-                    {sender:cleanedReceiver, receiver: data?.sender}
-                ]
-            }).populate('messages').sort({updatedAt: -1})
 
-            io.to(data?.sender).emit('message', getConversationMessage.messages)
-            io.to(cleanedReceiver).emit('message', getConversationMessage.messages)
-        })
+                const message = new MessageModel({
+                    text: data.text,
+                    imageUrl: data.imageUrl,
+                    videoUrl: data.videoUrl,
+                    msByUserId: data.msByUserId
+                });
+
+                const savedMessage = await message.save();
+
+                await ConversationModel.findByIdAndUpdate(conversation._id, {
+                    $push: { messages: savedMessage._id }
+                });
+
+                conversation = await ConversationModel.findById(conversation._id)
+                    .populate('messages')
+                    .sort({ updatedAt: -1 });
+
+                /// send conversation
+                io.to(data?.sender).emit('message', conversation.messages);
+                io.to(cleanedReceiver).emit('message', conversation.messages);
+
+            } catch (error) {
+                console.error('Error saving new message:', error.message);
+            }
+        });
+
+        /// sidebar
+        socket.on('sidebar', async (currentUserId) => {
+            try {
+                const currentUserConversations = await ConversationModel.find({
+                    $or: [
+                        { sender: currentUserId },
+                        { receiver: currentUserId }
+                    ]
+                }).sort({ updatedAt: -1 }).populate('messages').populate('sender').populate('receiver');
+
+                const conversations = currentUserConversations.map((conv) => {
+                    const unseenMessages = conv.messages.reduce((prev, current) => prev + (current.seen ? 0 : 1), 0);
+                    return {
+                        id: conv._id,
+                        sender: conv.sender,
+                        receiver: conv.receiver,
+                        unseenMessages: unseenMessages,
+                        lastMessage: conv.messages[conv.messages.length - 1]
+                    };
+                });
+
+                socket.emit('conversation', conversations);
+
+            } catch (error) {
+                console.error('Error fetching sidebar conversations:', error.message);
+            }
+        });
 
         socket.on('disconnect', () => {
-            onlineUsers.delete(user._id);
+            onlineUsers.delete(user._id.toString());
             console.log('disconnected user', socket.id);
 
             io.emit('online users', Array.from(onlineUsers));
         });
+
     } catch (error) {
         console.error('Error retrieving user details from token:', error.message);
     }
-})
+});
+
 module.exports = {
     app,
     server

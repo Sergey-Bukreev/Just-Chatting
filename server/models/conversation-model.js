@@ -4,7 +4,7 @@ const messageSchema = new mongoose.Schema({
         type: String,
         default:''
     },
-    imgUrl: {
+    imageUrl: {
         type: String,
         default:''
     },
