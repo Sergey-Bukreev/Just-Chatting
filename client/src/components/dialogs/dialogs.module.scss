@@ -1,11 +1,67 @@
+// dialogs.module.scss
+
 .root {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
   gap: 1rem;
-  width: 100%;
-  max-width: 400px;
-  margin: 0 auto;
+  overflow-y: auto;
+  padding: 0.5rem;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.conversation {
+  display: flex;
+  gap: 1rem;
+  background-color: var(--color-dark-300);
+  border: 1px solid var(--color-dark-500);
   padding: 1rem;
+  border-radius: 8px;
+  transition: background-color 0.3s;
+  align-items: center;
+  text-decoration: none;
+}
+
+.messageBlock {
+  flex-grow: 1;
+}
+.nameDate {
+  display: flex;
+  flex-direction: row;
+}
+
+.message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.messageText {
+  flex: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.messageDate {
+  display: flex;
+  align-items: center;
+
+  margin-left: auto;
+  color: var(--color-light-900);
+}
+.messageUnseen {
+  display: flex;
+  align-items: center;
+
+  margin-left: auto;
+  border: 1px solid var(--color-dark-900);
+  border-radius: 50%;
+  padding: 0.2rem;
+  background-color: var(--color-dark-900);
+  color: var(--color-light-100);
 }

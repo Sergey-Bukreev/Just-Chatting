@@ -6,13 +6,13 @@ import { RiChat1Line, RiLogoutCircleLine, RiUserAddFill } from 'react-icons/ri'
 
 import s from './side-menu.module.scss'
 
-import { RootState } from '../../../store/store.ts'
+import { RootState } from '../../../store/store'
 import { Avatar } from '../../ui/avatar/avataar'
 import { Button } from '../../ui/button'
 
 export type SideMenuProps = {
   active: boolean
-
+  onLogout: () => void
   onOpenAddFriendsClick: () => void
   onOpenEditClick: () => void
   onOpenMessagesClick: () => void
@@ -21,6 +21,7 @@ export type SideMenuProps = {
 export const SideMenu = ({
   active,
 
+  onLogout,
   onOpenAddFriendsClick,
   onOpenEditClick,
   onOpenMessagesClick,
@@ -57,7 +58,7 @@ export const SideMenu = ({
           <RiUserAddFill className={s.icon} />
         </Button>
       </div>
-      <Button className={s.iconButton} variant={'icon'}>
+      <Button className={s.iconButton} onClick={onLogout} variant={'icon'}>
         <RiLogoutCircleLine className={s.icon} />
       </Button>
     </div>
