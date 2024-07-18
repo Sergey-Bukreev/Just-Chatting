@@ -1,4 +1,10 @@
-import { Outlet, RouteObject, RouterProvider, createBrowserRouter } from 'react-router-dom'
+import {
+  Navigate,
+  Outlet,
+  RouteObject,
+  RouterProvider,
+  createBrowserRouter,
+} from 'react-router-dom'
 
 import { Layout } from '../components/layout/layout'
 import { CheckEmailPage } from '../pages/check-email-page'
@@ -7,6 +13,7 @@ import { ForgotPasswordPage } from '../pages/forgot-password-page/forgot-passwor
 import { HomePage } from '../pages/home-page'
 import { MessagePage } from '../pages/message-page'
 import { RegisterPage } from '../pages/register-page'
+import { useAuth } from '../utils/auth-context'
 const publicRoutes: RouteObject[] = [
   {
     element: <RegisterPage />,
@@ -39,7 +46,11 @@ const privateRoutes: RouteObject[] = [
 ]
 
 function PrivateRoutes() {
-  // const { isAuthenticated } = useAuthContext()
+  const { isAuthenticated } = useAuth()
+
+  if (!isAuthenticated) {
+    return <Navigate to={'/email'} />
+  }
 
   return <Outlet />
 }

@@ -8,6 +8,7 @@ import axios from 'axios'
 import s from './../form.module.scss'
 
 import { setToken } from '../../../store/userSlice'
+import { useAuth } from '../../../utils/auth-context'
 import { Button } from '../../ui/button'
 import { Input } from '../../ui/input/input'
 import { Typography } from '../../ui/typography'
@@ -16,6 +17,7 @@ export const PasswordForm = () => {
   const [data, setData] = useState({
     password: '',
   })
+  const { authIn } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const dispatch = useDispatch()
@@ -54,7 +56,7 @@ export const PasswordForm = () => {
         dispatch(setToken(response?.data?.token))
         localStorage.setItem('token', response.data.token)
         setData({ password: '' })
-
+        authIn()
         navigate(`/home`)
       }
     } catch (error: any) {

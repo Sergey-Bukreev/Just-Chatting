@@ -1,11 +1,15 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
+
+import axios from 'axios'
 
 import s from './side-bar.module.scss'
 
 import { RootState } from '../../store/store'
 import { UserState, logout } from '../../store/userSlice'
+import { useAuth } from '../../utils/auth-context'
 import { useSocket } from '../../utils/socket-context'
 import { Dialogs } from '../dialogs'
 import { EditUserForm } from '../forms/edit-user-form/edit-user-form'
@@ -42,6 +46,7 @@ export const SideBar = () => {
   const socket = useSocket()
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const { authOut } = useAuth()
 
   useEffect(() => {
     if (socket) {
@@ -87,10 +92,22 @@ export const SideBar = () => {
     setIsOpenEditUserDetails(false)
     setIsOpenAddFriends(true)
   }
-  const handleOnLogout = () => {
-    dispatch(logout())
-    navigate('/email')
-    localStorage.clear()
+  const handleOnLogout = async () => {
+    const URL = `${import.meta.env.VITE_REACT_BACKEND_URL}/api/logout`
+
+    try {
+      const response = await axios.get(URL)
+
+      toast.success(response.data.message)
+      if (response.data.success) {
+        authOut()
+        navigate('/email')
+        dispatch(logout())
+        localStorage.clear()
+      }
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message)
+    }
   }
 
   return (
