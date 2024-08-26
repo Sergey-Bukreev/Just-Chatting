@@ -4,6 +4,7 @@ require('dotenv').config();
 const connectDB = require('./config/connectDB');
 const router = require('./routes/index');
 const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser')
 const {app,server} = require('./socket/index')
 // const app = express();
 const corsOptions = {
@@ -14,8 +15,11 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+app.use(bodyParser.json())
 app.use(express.json());
 app.use(cookieParser())
+app.use(express.urlencoded({ extended: true }))
+
 
 app.get('/', (req, res) => {
     res.json({

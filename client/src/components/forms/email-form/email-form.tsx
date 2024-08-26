@@ -32,7 +32,14 @@ export const EmailForm = () => {
     const URL = `${import.meta.env.VITE_REACT_BACKEND_URL}/api/email`
 
     try {
-      const response = await axios.post(URL, data)
+      const response = await axios.post(URL, data, {
+        headers: {
+          'Access-Control-Allow-Credentials': true,
+          'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json',
+        },
+      })
 
       toast.success(response.data.message)
       if (response.data.success) {
